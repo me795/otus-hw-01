@@ -2,13 +2,12 @@ plugins {
     id 'java'
     id 'idea'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+
 }
 
 sourceCompatibility = JavaVersion.VERSION_15
 targetCompatibility = JavaVersion.VERSION_15
 
-group 'org.example'
 version '1.0-SNAPSHOT'
 
 idea {
@@ -21,41 +20,20 @@ idea {
     }
 }
 
-repositories {
-    mavenCentral()
-}
+allprojects {
 
-dependencyManagement {
-    imports {
-        mavenBom 'org.springframework.boot:spring-boot-dependencies:2.5.4'
+    group "ru.dvsokolov"
+
+    repositories {
+        mavenCentral()
     }
-}
 
-dependencies {
-    implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-}
-
-shadowJar {
-    archiveBaseName.set('helloGradle')
-    archiveVersion.set('0.1')
-    archiveClassifier.set('')
-    manifest {
-        attributes 'Main-Class': 'ru.dvsokolov.HelloOtus'
+    dependencyManagement {
+        imports {
+            mavenBom 'org.springframework.boot:spring-boot-dependencies:2.5.4'
+        }
     }
+
+
 }
 
-tasks.build.dependsOn tasks.shadowJar
-
-//task managedVersion {
-//    doLast {
-//        dependencyManagement.managedVersions.each {
-//            println it
-//        }
-//    }
-//}
-
-test {
-    useJUnitPlatform()
-}

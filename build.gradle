@@ -26,12 +26,10 @@ allprojects {
     dependencyManagement {
         dependencies {
             imports {
-                mavenBom("org.springframework.boot:spring-boot-dependencies:2.5.2")
+                mavenBom("org.springframework.boot:spring-boot-dependencies:${Versions.spring_boot_dep}")
             }
-            dependency("com.google.guava:guava:31.0.1-jre")
+            dependency("com.google.guava:guava:${Versions.guava}")
         }
     }
-
-
 }
 

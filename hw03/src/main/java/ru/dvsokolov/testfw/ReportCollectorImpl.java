@@ -20,10 +20,22 @@ public class ReportCollectorImpl implements ReportCollector {
 
     @Override
     public void viewReport() {
+
+        int allTestCounter = 0;
+        int passedTestCounter = 0;
+
+        io.println();
+        io.println("--------------------------------------------------------", IO.FontColor.ANSI_BLUE);
+        io.println("Report: ", IO.FontColor.ANSI_BLUE);
+        io.println();
+
         for (TestReport testReport : testReportList) {
+
+            allTestCounter++;
 
             switch (testReport.getStatus().getCode()) {
                 case "passed" -> {
+                    passedTestCounter++;
                     io.print(testReport.getMethodName() + " ");
                     io.println(testReport.getStatus().getCode(), IO.FontColor.ANSI_GREEN);
                 }
@@ -35,5 +47,8 @@ public class ReportCollectorImpl implements ReportCollector {
                 default -> io.println(testReport.getStatus().getCode(), IO.FontColor.ANSI_BLUE);
             }
         }
+        io.println();
+        io.println(String.format("Passed %d of %d tests", passedTestCounter, allTestCounter), IO.FontColor.ANSI_BLUE);
+        io.println("--------------------------------------------------------", IO.FontColor.ANSI_BLUE);
     }
 }

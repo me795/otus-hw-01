@@ -3,12 +3,11 @@ package ru.dvsokolov.experiment.test;
 import ru.dvsokolov.experiment.app.Experiment;
 import ru.dvsokolov.experiment.app.ExperimentImpl;
 import ru.dvsokolov.testfw.Assertions;
-import ru.dvsokolov.testfw.ObservableClass;
 import ru.dvsokolov.testfw.annotations.After;
 import ru.dvsokolov.testfw.annotations.Before;
 import ru.dvsokolov.testfw.annotations.Test;
 
-public class ExperimentTest implements ObservableClass {
+public class ExperimentTest {
 
     private Experiment experiment;
 

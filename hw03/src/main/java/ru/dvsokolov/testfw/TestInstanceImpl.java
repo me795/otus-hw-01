@@ -11,61 +11,62 @@ public class TestInstanceImpl implements TestInstance {
     private final Method testMethod;
     private final Set<Method> afterMethods;
     private final Constructor<?> defaultConstructor;
-    private final TestReport testReport = new TestReportImpl();
 
     public TestInstanceImpl(Constructor<?> defaultConstructor, Set<Method> beforeMethods, Method testMethod, Set<Method> afterMethods) {
         this.defaultConstructor = defaultConstructor;
         this.beforeMethods = beforeMethods;
         this.testMethod = testMethod;
         this.afterMethods = afterMethods;
-        testReport.setStatus(TestReport.Status.UNDEFINED);
     }
 
     @Override
-    public void test() {
+    public TestReport executeTest() {
 
-        Object object = getObject();
-        runExtraMethods(beforeMethods, object);
+        TestReport testReport = new TestReportImpl();
+        testReport.setStatus(TestReport.Status.UNDEFINED);
 
         try {
-            testReport.setMethodName(testMethod.getName());
-            testMethod.invoke(object);
-            testReport.setStatus(TestReport.Status.PASSED);
-        }  catch (IllegalAccessException | InvocationTargetException e) {
-            testReport.setComment(e.getCause().getMessage());
-            testReport.setStatus(TestReport.Status.FAILED);
-        }
+            Object object = getObject();
 
-        runExtraMethods(afterMethods, object);
-    }
+            try {
+                runExtraMethods(beforeMethods, object);
+                try {
+                    testReport.setMethodName(testMethod.getName());
+                    testMethod.invoke(object);
+                    testReport.setStatus(TestReport.Status.PASSED);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    testReport.setComment(e.getCause().getMessage());
+                    testReport.setStatus(TestReport.Status.FAILED);
+                }
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
 
+            try {
+                runExtraMethods(afterMethods, object);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
 
-    private Object getObject() {
-        assert defaultConstructor != null;
-        Object object = null;
-        try {
-            object = defaultConstructor.newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
 
-        return object;
+        return testReport;
     }
 
-    private void runExtraMethods(Set<Method> methods, Object object) {
+
+    private Object getObject() throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        assert defaultConstructor != null;
+        return defaultConstructor.newInstance();
+    }
+
+    private void runExtraMethods(Set<Method> methods, Object object) throws IllegalAccessException, InvocationTargetException {
 
         for (Method method : methods) {
-            try {
-                method.invoke(object);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            method.invoke(object);
         }
 
     }
 
-    @Override
-    public TestReport getReport() {
-        return testReport;
-    }
 }

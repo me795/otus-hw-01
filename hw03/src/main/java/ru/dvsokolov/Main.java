@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Class<? extends ObservableClass> testClass = ExperimentTest.class;
+        Class<?> testClass = ExperimentTest.class;
         IO io = new IOImpl(System.out,System.in);
         ReportCollector reportCollector = new ReportCollectorImpl(io);
 

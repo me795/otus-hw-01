@@ -4,9 +4,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import ru.dvsokolov.testfw.annotations.Before;
-import ru.dvsokolov.testfw.annotations.Test;
-import ru.dvsokolov.utils.IO;
+import ru.dvsokolov.testfw.exceptions.ReflectionSlicerException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -16,10 +14,10 @@ import java.util.Set;
 
 public class ReflectionSlicer {
 
-    public static Constructor<?> getDefaultConstructor(Class<? extends ObservableClass> clazz){
+    public static Constructor<?> getDefaultConstructor(Class<?> clazz){
         Constructor<?>[] constructors = clazz.getConstructors();
         Constructor<?> defaultConstructor = null;
-        for (Constructor constructor : constructors) {
+        for (Constructor<?> constructor : constructors) {
             Class<?>[] params = constructor.getParameterTypes();
             if (Arrays.stream(params).findAny().isPresent()) {
                 continue;
@@ -29,7 +27,7 @@ public class ReflectionSlicer {
         return defaultConstructor;
     }
 
-    public static Set<Method> getAllMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
+    public static Set<Method> getAllMethodsAnnotatedWith(Class<? extends Annotation> annotation) throws ReflectionSlicerException {
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forJavaClassPath())
                 .setScanners(new MethodAnnotationsScanner()));

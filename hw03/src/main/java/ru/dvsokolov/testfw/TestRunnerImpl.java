@@ -3,6 +3,7 @@ package ru.dvsokolov.testfw;
 import ru.dvsokolov.testfw.annotations.After;
 import ru.dvsokolov.testfw.annotations.Before;
 import ru.dvsokolov.testfw.annotations.Test;
+import ru.dvsokolov.testfw.exceptions.ReflectionSlicerException;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
@@ -11,12 +12,11 @@ import java.util.Set;
 
 public class TestRunnerImpl implements TestRunner{
 
-    private final Class<? extends ObservableClass> testClass;
     private final ReportCollector reportCollector;
     private final List<TestInstance> testInstanceList = new ArrayList<>();
 
-    public TestRunnerImpl(Class<? extends ObservableClass> testClass, ReportCollector reportCollector) {
-        this.testClass = testClass;
+    public TestRunnerImpl(Class<?> testClass, ReportCollector reportCollector) {
+
         this.reportCollector = reportCollector;
 
         try {
@@ -30,7 +30,7 @@ public class TestRunnerImpl implements TestRunner{
                 testInstanceList.add(testInstance);
             }
 
-        } catch (Exception e) {
+        } catch (ReflectionSlicerException e) {
             e.printStackTrace();
         }
     }
@@ -39,8 +39,7 @@ public class TestRunnerImpl implements TestRunner{
     public void launch() {
 
         for (TestInstance testInstance : testInstanceList){
-            testInstance.test();
-            reportCollector.addReport(testInstance.getReport());
+            reportCollector.addReport(testInstance.executeTest());
         }
 
     }

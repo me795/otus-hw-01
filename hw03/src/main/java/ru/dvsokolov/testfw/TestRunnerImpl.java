@@ -10,14 +10,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class TestRunnerImpl implements TestRunner{
+public class TestRunnerImpl implements TestRunner {
 
+    private final Class<?> testClass;
     private final ReportCollector reportCollector;
-    private final List<TestInstance> testInstanceList = new ArrayList<>();
 
     public TestRunnerImpl(Class<?> testClass, ReportCollector reportCollector) {
-
+        this.testClass = testClass;
         this.reportCollector = reportCollector;
+    }
+
+    @Override
+    public void launch() {
+
+        List<TestInstance> testInstanceList = prepareInstances(testClass);
+
+        for (TestInstance testInstance : testInstanceList) {
+            reportCollector.addReport(testInstance.executeTest());
+        }
+    }
+
+    private List<TestInstance> prepareInstances(Class<?> testClass) {
+
+        List<TestInstance> testInstanceList = new ArrayList<>();
 
         try {
             Set<Method> beforeMethods = ReflectionSlicer.getAllMethodsAnnotatedWith(Before.class);
@@ -26,22 +41,15 @@ public class TestRunnerImpl implements TestRunner{
             Constructor<?> defaultConstructor = ReflectionSlicer.getDefaultConstructor(testClass);
 
             for (Method testMethod : testMethods) {
-                TestInstance testInstance = new TestInstanceImpl(defaultConstructor,beforeMethods,testMethod,afterMethods);
+                TestInstance testInstance = new TestInstanceImpl(defaultConstructor, beforeMethods, testMethod, afterMethods);
                 testInstanceList.add(testInstance);
             }
 
         } catch (ReflectionSlicerException e) {
             e.printStackTrace();
         }
-    }
 
-    @Override
-    public void launch() {
-
-        for (TestInstance testInstance : testInstanceList){
-            reportCollector.addReport(testInstance.executeTest());
-        }
-
+        return testInstanceList;
     }
 
 

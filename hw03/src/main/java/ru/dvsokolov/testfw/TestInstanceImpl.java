@@ -40,14 +40,13 @@ public class TestInstanceImpl implements TestInstance {
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    runExtraMethods(afterMethods, object);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
             }
-
-            try {
-                runExtraMethods(afterMethods, object);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -57,6 +56,7 @@ public class TestInstanceImpl implements TestInstance {
 
 
     private Object getObject() throws InstantiationException, IllegalAccessException, InvocationTargetException {
+
         assert defaultConstructor != null;
         return defaultConstructor.newInstance();
     }
@@ -66,7 +66,6 @@ public class TestInstanceImpl implements TestInstance {
         for (Method method : methods) {
             method.invoke(object);
         }
-
     }
 
 }

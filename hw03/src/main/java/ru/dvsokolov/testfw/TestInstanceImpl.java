@@ -3,16 +3,16 @@ package ru.dvsokolov.testfw;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Set;
+import java.util.List;
 
 public class TestInstanceImpl implements TestInstance {
 
-    private final Set<Method> beforeMethods;
+    private final List<Method> beforeMethods;
     private final Method testMethod;
-    private final Set<Method> afterMethods;
+    private final List<Method> afterMethods;
     private final Constructor<?> defaultConstructor;
 
-    public TestInstanceImpl(Constructor<?> defaultConstructor, Set<Method> beforeMethods, Method testMethod, Set<Method> afterMethods) {
+    public TestInstanceImpl(Constructor<?> defaultConstructor, List<Method> beforeMethods, Method testMethod, List<Method> afterMethods) {
         this.defaultConstructor = defaultConstructor;
         this.beforeMethods = beforeMethods;
         this.testMethod = testMethod;
@@ -61,7 +61,7 @@ public class TestInstanceImpl implements TestInstance {
         return defaultConstructor.newInstance();
     }
 
-    private void runExtraMethods(Set<Method> methods, Object object) throws IllegalAccessException, InvocationTargetException {
+    private void runExtraMethods(List<Method> methods, Object object) throws IllegalAccessException, InvocationTargetException {
 
         for (Method method : methods) {
             method.invoke(object);

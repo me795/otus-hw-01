@@ -8,7 +8,6 @@ import ru.dvsokolov.testfw.exceptions.ReflectionSlicerException;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class TestRunnerImpl implements TestRunner {
 
@@ -35,9 +34,12 @@ public class TestRunnerImpl implements TestRunner {
         List<TestInstance> testInstanceList = new ArrayList<>();
 
         try {
-            Set<Method> beforeMethods = ReflectionSlicer.getAllMethodsAnnotatedWith(Before.class);
-            Set<Method> testMethods = ReflectionSlicer.getAllMethodsAnnotatedWith(Test.class);
-            Set<Method> afterMethods = ReflectionSlicer.getAllMethodsAnnotatedWith(After.class);
+
+            Method[] methods = testClass.getDeclaredMethods();
+
+            List<Method> beforeMethods = ReflectionSlicer.getAllMethodsAnnotatedWith(Before.class,methods);
+            List<Method> testMethods = ReflectionSlicer.getAllMethodsAnnotatedWith(Test.class,methods);
+            List<Method> afterMethods = ReflectionSlicer.getAllMethodsAnnotatedWith(After.class,methods);
             Constructor<?> defaultConstructor = ReflectionSlicer.getDefaultConstructor(testClass);
 
             for (Method testMethod : testMethods) {

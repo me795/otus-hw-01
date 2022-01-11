@@ -1,5 +1,13 @@
 package ru.dvsokolov.patterns;
 
+import ru.dvsokolov.patterns.handler.ComplexProcessor;
+import ru.dvsokolov.patterns.listener.homework.HistoryListener;
+import ru.dvsokolov.patterns.model.Message;
+import ru.dvsokolov.patterns.processor.homework.ProcessorChangeField11Field12;
+import ru.dvsokolov.patterns.processor.homework.ProcessorWithException;
+
+import java.util.List;
+
 public class HomeWork {
 
     /*
@@ -20,5 +28,25 @@ public class HomeWork {
            по аналогии с Demo.class
            из элеменов "to do" создать new ComplexProcessor и обработать сообщение
          */
+        var processors = List.of(new ProcessorChangeField11Field12(),
+                new ProcessorWithException(ex -> {}));
+
+        var complexProcessor = new ComplexProcessor(processors, ex -> {});
+        var listenerPrinter = new HistoryListener();
+        complexProcessor.addListener(listenerPrinter);
+
+        var message = new Message.Builder(1L)
+                .field1("field1")
+                .field2("field2")
+                .field3("field3")
+                .field10("field10")
+                .field11("field11")
+                .field12("field12")
+                .build();
+
+        var result = complexProcessor.handle(message);
+        System.out.println("result:" + result);
+
+        complexProcessor.removeListener(listenerPrinter);
     }
 }

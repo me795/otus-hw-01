@@ -9,15 +9,16 @@ import java.util.function.Consumer;
 public class ProcessorWithException implements Processor {
 
     private final Consumer<Exception> errorHandler;
+    private final ExceptionGenerator exceptionGenerator;
 
-    public ProcessorWithException(Consumer<Exception> errorHandler) {
+    public ProcessorWithException(Consumer<Exception> errorHandler, ExceptionGenerator exceptionGenerator) {
         this.errorHandler = errorHandler;
+        this.exceptionGenerator = exceptionGenerator;
     }
 
     @Override
     public Message process(Message message) {
 
-        var exceptionGenerator = new ExceptionGenerator(LocalDateTime::now);
         try {
             exceptionGenerator.throwEvenSecondException();
         } catch (Exception ex) {

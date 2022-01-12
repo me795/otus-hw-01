@@ -3,9 +3,11 @@ package ru.dvsokolov.patterns;
 import ru.dvsokolov.patterns.handler.ComplexProcessor;
 import ru.dvsokolov.patterns.listener.homework.HistoryListener;
 import ru.dvsokolov.patterns.model.Message;
+import ru.dvsokolov.patterns.processor.homework.ExceptionGeneratorImpl;
 import ru.dvsokolov.patterns.processor.homework.ProcessorChangeField11Field12;
 import ru.dvsokolov.patterns.processor.homework.ProcessorWithException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class HomeWork {
@@ -29,7 +31,7 @@ public class HomeWork {
            из элеменов "to do" создать new ComplexProcessor и обработать сообщение
          */
         var processors = List.of(new ProcessorChangeField11Field12(),
-                new ProcessorWithException(ex -> {}));
+                new ProcessorWithException(ex -> {}, new ExceptionGeneratorImpl(LocalDateTime::now)));
 
         var complexProcessor = new ComplexProcessor(processors, ex -> {});
         var listenerPrinter = new HistoryListener();

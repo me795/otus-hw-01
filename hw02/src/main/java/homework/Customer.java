@@ -5,8 +5,6 @@ public class Customer implements Cloneable {
     private String name;
     private long scores;
 
-    //todo: 1. в этом классе надо исправить ошибки
-
     public Customer(long id, String name, long scores) {
         this.id = id;
         this.name = name;
@@ -56,10 +54,7 @@ public class Customer implements Cloneable {
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-//        result = 31 * result + (name != null ? name.hashCode() : 0);
-//        result = 31 * result + (int) (scores ^ (scores >>> 32));
-        return result;
+        return (int) (id ^ (id >>> 32));
     }
 
     @Override

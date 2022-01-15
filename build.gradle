@@ -29,6 +29,7 @@ allprojects {
                 mavenBom("org.springframework.boot:spring-boot-dependencies:${Versions.spring_boot_dep}")
             }
             dependency("com.google.guava:guava:${Versions.guava}")
+            dependency("com.google.code.gson:gson:${Versions.gson}")
         }
     }
 }

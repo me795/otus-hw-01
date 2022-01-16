@@ -22,20 +22,28 @@ public class ResourcesFileLoader implements ru.dvsokolov.dataprocessor.Loader {
 
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream inputStream = classloader.getResourceAsStream(fileName);
-
         assert inputStream != null;
-        BufferedReader bufferedReader =
-                new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
-        StringBuilder stringBuilder = new StringBuilder();
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            stringBuilder.append(line);
-            stringBuilder.append('\n');
+        try {
+            BufferedReader bufferedReader =
+                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+                stringBuilder.append('\n');
+            }
+
+            String fileContent = stringBuilder.toString();
+            Gson gson = new Gson();
+            Type measurementListType = new TypeToken<List<Measurement>>() {}.getType();
+            return gson.fromJson(fileContent, measurementListType);
+
+        } finally {
+            inputStream.close();
         }
-        String fileContent = stringBuilder.toString();
-        Gson gson = new Gson();
-        Type measurementListType = new TypeToken<List<Measurement>>() {}.getType();
-        return gson.fromJson(fileContent, measurementListType);
+
+
     }
 }

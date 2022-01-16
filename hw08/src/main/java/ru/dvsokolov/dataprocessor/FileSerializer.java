@@ -22,7 +22,7 @@ public class FileSerializer implements Serializer {
         try (var bufferedWriter = new BufferedWriter(new FileWriter(fileName))) {
             bufferedWriter.write(jsonStr);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new FileProcessException(e);
         }
     }
 }

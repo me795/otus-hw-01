@@ -13,15 +13,12 @@ public class ProcessorAggregator implements Processor {
     @Override
     public Map<String, Double> process(List<Measurement> data) {
 
-        var resultMap = data.stream()
-                .collect(toMap(Measurement::getName, Function.identity(), (a, b) -> new Measurement(a.getName(), a.getValue() + b.getValue())))
-                .entrySet()
-                .stream()
-                .collect(toMap(
-                        Map.Entry::getKey,
-                        v -> v.getValue().getValue()
-                ));
+        return data.stream()
+                .collect(groupingBy(
+                        Measurement::getName,
+                        TreeMap::new,
+                        Collectors.summingDouble(Measurement::getValue)
+                        ));
 
-        return new TreeMap<>(resultMap);
     }
 }

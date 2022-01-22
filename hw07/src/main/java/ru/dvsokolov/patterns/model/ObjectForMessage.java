@@ -1,5 +1,5 @@
 package ru.dvsokolov.patterns.model;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class ObjectForMessage {
@@ -11,5 +11,12 @@ public class ObjectForMessage {
 
     public void setData(List<String> data) {
         this.data = data;
+    }
+
+    public ObjectForMessage copy(){
+        var copyObjectForMessage = new ObjectForMessage();
+        List<String> copyData = new ArrayList<>(this.data);
+        copyObjectForMessage.setData(copyData);
+        return copyObjectForMessage;
     }
 }

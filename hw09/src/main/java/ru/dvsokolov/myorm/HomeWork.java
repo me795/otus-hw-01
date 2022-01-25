@@ -14,7 +14,7 @@ import ru.dvsokolov.myorm.jdbc.mapper.*;
 
 import javax.sql.DataSource;
 
-public class   HomeWork {
+public class HomeWork {
     private static final String URL = "jdbc:postgresql://localhost:5430/demoDB";
     private static final String USER = "usr";
     private static final String PASSWORD = "pwd";
@@ -29,8 +29,8 @@ public class   HomeWork {
         var dbExecutor = new DbExecutorImpl();
 
 // Работа с клиентом
-        EntityClassMetaData entityClassMetaDataClient = new EntityClassMetaDataImpl(Client.class);
-        EntitySQLMetaData entitySQLMetaDataClient = new EntitySQLMetaDataImpl(entityClassMetaDataClient);
+        EntityClassMetaData entityClassMetaDataClient; // = new EntityClassMetaDataImpl();
+        EntitySQLMetaData entitySQLMetaDataClient = null; //= new EntitySQLMetaDataImpl();
         var dataTemplateClient = new DataTemplateJdbc<Client>(dbExecutor, entitySQLMetaDataClient); //реализация DataTemplate, универсальная
 
 // Код дальше должен остаться
@@ -44,8 +44,8 @@ public class   HomeWork {
 
 // Сделайте тоже самое с классом Manager (для него надо сделать свою таблицу)
 
-        EntityClassMetaData entityClassMetaDataManager = new EntityClassMetaDataImpl(Manager.class);
-        EntitySQLMetaData entitySQLMetaDataManager = new EntitySQLMetaDataImpl(entityClassMetaDataManager);
+        EntityClassMetaData entityClassMetaDataManager; // = new EntityClassMetaDataImpl();
+        EntitySQLMetaData entitySQLMetaDataManager = null; //= new EntitySQLMetaDataImpl();
         var dataTemplateManager = new DataTemplateJdbc<Manager>(dbExecutor, entitySQLMetaDataManager);
 
         var dbServiceManager = new DbServiceManagerImpl(transactionRunner, dataTemplateManager);

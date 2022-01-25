@@ -22,16 +22,64 @@ import java.util.Optional;
 public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     private final DbExecutor dbExecutor;
-    private final EntitySQLMetaData entitySQLMetaData;
+    private final ru.dvsokolov.myorm.jdbc.mapper.EntitySQLMetaData entitySQLMetaData;
 
-    public DataTemplateJdbc(DbExecutor dbExecutor, EntitySQLMetaData entitySQLMetaData) {
+    private static final Logger log = LoggerFactory.getLogger(DataTemplateJdbc.class);
+
+    public DataTemplateJdbc(DbExecutor dbExecutor, ru.dvsokolov.myorm.jdbc.mapper.EntitySQLMetaData entitySQLMetaData) {
         this.dbExecutor = dbExecutor;
         this.entitySQLMetaData = entitySQLMetaData;
     }
 
     @Override
     public Optional<T> findById(Connection connection, long id) {
-        throw new UnsupportedOperationException();
+        var entity = dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), List.of(id),
+                rs -> {
+
+                    try {
+                        var entityField = entitySQLMetaData.getClass().getDeclaredField("entityClassMetaData");
+                        entityField.setAccessible(true);
+                        EntityClassMetaData entityClassMetaData = (EntityClassMetaData) entityField.get(entitySQLMetaData);
+
+                        String name = entityClassMetaData.getName();
+                        System.out.println(name);
+                        Constructor<T> constructor = entityClassMetaData.getConstructor();
+                        Object obj = constructor.newInstance();
+
+                        try {
+                            if (rs.next()) {
+
+                                List<Field> fieldList = entityClassMetaData.getAllFields();
+
+                                for (var field : fieldList){
+                                    try {
+                                        var fieldName = field.getName();
+                                        field.setAccessible(true);
+                                        field.set(obj,rs.getObject(fieldName));
+                                    } catch (IllegalAccessException e) {
+                                        throw new RuntimeException("Field not found");
+                                    }
+                                }
+                                return obj;
+                            }
+                        } catch (SQLException e) {
+                            log.error(e.getMessage(), e);
+                            throw new RuntimeException("SQL error: "+ e.getMessage());
+                        }
+
+
+                    } catch (NoSuchFieldException e) {
+                        log.error(e.getMessage(), e);
+                        throw new RuntimeException("Field not found");
+                    } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                        log.error(e.getMessage(), e);
+                        throw new RuntimeException(e);
+                    }
+
+                    return null;
+                });
+
+        return (Optional<T>) entity;
     }
 
     @Override
@@ -41,11 +89,30 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     @Override
     public long insert(Connection connection, T client) {
-        throw new UnsupportedOperationException();
+        var entityClassMetaData = getEntityClassMetaData(client);
+        List<Field> fieldList = entityClassMetaData.getFieldsWithoutId();
+        List<Object> valueList = new ArrayList<>();
+        for (var field : fieldList){
+            try {
+                var fieldName = field.getName();
+                field.setAccessible(true);
+                var value = field.get(client);
+                valueList.add(value);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Field not found");
+            }
+        }
+
+        String sql = entitySQLMetaData.getInsertSql();
+        return dbExecutor.executeStatement(connection, entitySQLMetaData.getInsertSql(), valueList);
     }
 
     @Override
     public void update(Connection connection, T client) {
         throw new UnsupportedOperationException();
+    }
+
+    private EntityClassMetaData getEntityClassMetaData(T obj){
+        return new EntityClassMetaDataImpl(obj.getClass());
     }
 }

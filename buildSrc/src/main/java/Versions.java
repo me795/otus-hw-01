@@ -3,5 +3,5 @@ public interface Versions {
     String dozer = "5.5.1";
     String spring_boot_dep = "2.5.2";
     String gson = "2.8.9";
-
+    String testcontainers = "1.15.3";
 }

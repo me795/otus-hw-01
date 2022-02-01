@@ -11,7 +11,9 @@ import ru.dvsokolov.jpql.core.repository.DataTemplateHibernate;
 import ru.dvsokolov.jpql.core.repository.HibernateUtils;
 import ru.dvsokolov.jpql.core.sessionmanager.TransactionManagerHibernate;
 import ru.dvsokolov.jpql.crm.dbmigrations.MigrationsExecutorFlyway;
+import ru.dvsokolov.jpql.crm.model.Address;
 import ru.dvsokolov.jpql.crm.model.Client;
+import ru.dvsokolov.jpql.crm.model.Phone;
 import ru.dvsokolov.jpql.crm.service.DBServiceClient;
 import ru.dvsokolov.jpql.crm.service.DbServiceClientImpl;
 
@@ -51,7 +53,7 @@ public abstract class AbstractHibernateTest {
         configuration.setProperty("hibernate.connection.username", dbUserName);
         configuration.setProperty("hibernate.connection.password", dbPassword);
 
-        sessionFactory = HibernateUtils.buildSessionFactory(configuration, Client.class);
+        sessionFactory = HibernateUtils.buildSessionFactory(configuration, Client.class, Address.class, Phone.class);
 
         transactionManager = new TransactionManagerHibernate(sessionFactory);
         clientTemplate = new DataTemplateHibernate<>(Client.class);

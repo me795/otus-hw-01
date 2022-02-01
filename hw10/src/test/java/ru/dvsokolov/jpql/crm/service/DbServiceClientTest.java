@@ -3,7 +3,11 @@ package ru.dvsokolov.jpql.crm.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.dvsokolov.jpql.base.AbstractHibernateTest;
+import ru.dvsokolov.jpql.crm.model.Address;
 import ru.dvsokolov.jpql.crm.model.Client;
+import ru.dvsokolov.jpql.crm.model.Phone;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -14,7 +18,9 @@ class DbServiceClientTest extends AbstractHibernateTest {
     @DisplayName(" корректно сохранять, изменять и загружать клиента")
     void shouldCorrectSaveClient() {
         //given
-        var client = new Client("Ivan");
+//        var client = new Client("Ivan");
+        var client = new Client(null, "Vasya", new Address(null, "AnyStreet"), List.of(new Phone(null, "13-555-22"),
+                new Phone(null, "14-666-333")));
 
         //when
         var savedClient = dbServiceClient.saveClient(client);

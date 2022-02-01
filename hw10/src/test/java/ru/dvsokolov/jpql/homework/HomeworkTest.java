@@ -2,7 +2,25 @@ package ru.dvsokolov.jpql.homework;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
+import org.hibernate.engine.jdbc.spi.SqlStatementLogger;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import ru.dvsokolov.jpql.crm.model.Address;
+import ru.dvsokolov.jpql.crm.model.Client;
+import ru.dvsokolov.jpql.crm.model.Phone;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class HomeworkTest {
 
@@ -12,7 +30,7 @@ class HomeworkTest {
 
     // Это надо раскомментировать, у выполненного ДЗ, все тесты должны проходить
     // Кроме удаления комментирования, тестовый класс менять нельзя
-/*
+
     @BeforeEach
     public void setUp() {
         makeTestDependencies();
@@ -100,5 +118,5 @@ class HomeworkTest {
             e.printStackTrace();
         }
     }
-*/
+
 }

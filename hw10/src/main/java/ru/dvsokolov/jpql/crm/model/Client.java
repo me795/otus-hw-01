@@ -1,6 +1,7 @@
 package ru.dvsokolov.jpql.crm.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -48,8 +49,10 @@ public class Client implements Cloneable {
 
     @Override
     public Client clone() {
-        var addressClone = this.address.clone();
-        var phonesCloneList = this.phones.stream()
+        var addressClone = (this.address == null ) ? null : this.address.clone();
+        var phonesCloneList = (this.phones == null || this.phones.size() == 0) ?
+                new ArrayList<Phone>() :
+                this.phones.stream()
                 .map(Phone::clone)
                 .toList();
         return new Client(this.id, this.name, addressClone, phonesCloneList);

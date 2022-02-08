@@ -7,7 +7,9 @@ import ru.dvsokolov.jpql.core.repository.DataTemplateHibernate;
 import ru.dvsokolov.jpql.core.repository.HibernateUtils;
 import ru.dvsokolov.jpql.core.sessionmanager.TransactionManagerHibernate;
 import ru.dvsokolov.jpql.crm.dbmigrations.MigrationsExecutorFlyway;
+import ru.dvsokolov.jpql.crm.model.Address;
 import ru.dvsokolov.jpql.crm.model.Client;
+import ru.dvsokolov.jpql.crm.model.Phone;
 import ru.dvsokolov.jpql.crm.service.DbServiceClientImpl;
 
 public class DbServiceDemo {
@@ -25,7 +27,7 @@ public class DbServiceDemo {
 
         new MigrationsExecutorFlyway(dbUrl, dbUserName, dbPassword).executeMigrations();
 
-        var sessionFactory = HibernateUtils.buildSessionFactory(configuration, Client.class);
+        var sessionFactory = HibernateUtils.buildSessionFactory(configuration, Client.class, Address.class, Phone.class);
 
         var transactionManager = new TransactionManagerHibernate(sessionFactory);
 ///

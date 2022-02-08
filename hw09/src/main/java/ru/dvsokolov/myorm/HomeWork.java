@@ -40,13 +40,18 @@ public class HomeWork {
         var clientSecond = dbServiceClient.saveClient(new Client("dbServiceSecond"));
         var clientSecondSelected = dbServiceClient.getClient(clientSecond.getId())
                 .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientSecond.getId()));
+        clientSecondSelected.setName("dbServiceSecondChangeName");
+        dbServiceClient.saveClient(clientSecondSelected);
         log.info("clientSecondSelected:{}", clientSecondSelected);
+
+        var clientList = dbServiceClient.findAll();
+        log.info("clientList:{}", clientList);
 
 // Сделайте тоже самое с классом Manager (для него надо сделать свою таблицу)
 
-        EntityClassMetaData entityClassMetaDataManager = new EntityClassMetaDataImpl(Manager.class);
+        EntityClassMetaData<Manager> entityClassMetaDataManager = EntityClassMetaDataImpl.of(Manager.class);
         EntitySQLMetaData entitySQLMetaDataManager = new EntitySQLMetaDataImpl(entityClassMetaDataManager);
-        var dataTemplateManager = new DataTemplateJdbc<Manager>(dbExecutor, entitySQLMetaDataManager);
+        var dataTemplateManager = new DataTemplateJdbc<Manager>(dbExecutor, entityClassMetaDataManager, entitySQLMetaDataManager);
 
         var dbServiceManager = new DbServiceManagerImpl(transactionRunner, dataTemplateManager);
         dbServiceManager.saveManager(new Manager("ManagerFirst"));

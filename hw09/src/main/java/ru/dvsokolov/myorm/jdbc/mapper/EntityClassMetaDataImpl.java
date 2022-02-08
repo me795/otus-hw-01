@@ -17,7 +17,7 @@ public class EntityClassMetaDataImpl implements EntityClassMetaData {
 
     @Override
     public String getName() {
-        return entity.getSimpleName();
+        return this.name;
     }
 
     @Override
@@ -31,10 +31,7 @@ public class EntityClassMetaDataImpl implements EntityClassMetaData {
 
     @Override
     public Field getIdField() {
-
-        var fields = this.getAllFields();
-
-        return fields.stream()
+        return this.fieldList.stream()
                 .filter(f -> f.isAnnotationPresent(Id.class))
                 .findFirst()
                 .get();
@@ -42,15 +39,12 @@ public class EntityClassMetaDataImpl implements EntityClassMetaData {
 
     @Override
     public List<Field> getAllFields() {
-        return List.of(entity.getDeclaredFields());
+        return this.fieldList;
     }
 
     @Override
     public List<Field> getFieldsWithoutId() {
-
-        var fields = this.getAllFields();
-
-        return fields.stream()
+        return this.fieldList.stream()
                 .filter(f -> ! f.isAnnotationPresent(Id.class))
                 .collect(Collectors.toList());
     }

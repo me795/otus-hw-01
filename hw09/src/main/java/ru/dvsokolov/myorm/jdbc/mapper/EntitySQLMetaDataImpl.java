@@ -4,11 +4,11 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
+public class EntitySQLMetaDataImpl<T> implements EntitySQLMetaData {
 
-    private final EntityClassMetaData entityClassMetaData;
+    private final EntityClassMetaData<T> entityClassMetaData;
 
-    public EntitySQLMetaDataImpl(EntityClassMetaData entityClassMetaData) {
+    public EntitySQLMetaDataImpl(EntityClassMetaData<T> entityClassMetaData) {
         this.entityClassMetaData = entityClassMetaData;
     }
 

@@ -3,6 +3,10 @@ package ru.dvsokolov.myorm;
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.dvsokolov.cachehw.DecoratorServiceClient;
+import ru.dvsokolov.cachehw.HwCache;
+import ru.dvsokolov.cachehw.HwListener;
+import ru.dvsokolov.cachehw.MyCache;
 import ru.dvsokolov.core.repository.executor.DbExecutorImpl;
 import ru.dvsokolov.core.sessionmanager.TransactionRunnerJdbc;
 import ru.dvsokolov.crm.datasource.DriverManagerDataSource;
@@ -31,35 +35,31 @@ public class HomeWork {
 // Работа с клиентом
         EntityClassMetaData<Client> entityClassMetaDataClient = EntityClassMetaDataImpl.of(Client.class);
         EntitySQLMetaData entitySQLMetaDataClient = new EntitySQLMetaDataImpl(entityClassMetaDataClient);
-        var dataTemplateClient = new DataTemplateJdbc<Client>(dbExecutor, entityClassMetaDataClient, entitySQLMetaDataClient); //реализация DataTemplate, универсальная
+        var dataTemplateClient = new DataTemplateJdbc<>(dbExecutor, entityClassMetaDataClient, entitySQLMetaDataClient); //реализация DataTemplate, универсальная
 
-// Код дальше должен остаться
         var dbServiceClient = new DbServiceClientImpl(transactionRunner, dataTemplateClient);
-        dbServiceClient.saveClient(new Client("dbServiceFirst"));
 
-        var clientSecond = dbServiceClient.saveClient(new Client("dbServiceSecond"));
-        var clientSecondSelected = dbServiceClient.getClient(clientSecond.getId())
-                .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientSecond.getId()));
-        clientSecondSelected.setName("dbServiceSecondChangeName");
-        dbServiceClient.saveClient(clientSecondSelected);
-        log.info("clientSecondSelected:{}", clientSecondSelected);
+        HwListener<String, Client> listener = new HwListener<>() {
+            @Override
+            public void notify(String key, Client value, String action) {
+                log.info("cache! key:{}, value:{}, action: {}", key, value, action);
+            }
+        };
+        HwCache<String, Client> cache = new MyCache<>();
+        cache.addListener(listener);
 
-        var clientList = dbServiceClient.findAll();
-        log.info("clientList:{}", clientList);
+        var decoratorServiceClient = new DecoratorServiceClient(dbServiceClient, cache);
 
-// Сделайте тоже самое с классом Manager (для него надо сделать свою таблицу)
-
-        EntityClassMetaData<Manager> entityClassMetaDataManager = EntityClassMetaDataImpl.of(Manager.class);
-        EntitySQLMetaData entitySQLMetaDataManager = new EntitySQLMetaDataImpl(entityClassMetaDataManager);
-        var dataTemplateManager = new DataTemplateJdbc<Manager>(dbExecutor, entityClassMetaDataManager, entitySQLMetaDataManager);
-
-        var dbServiceManager = new DbServiceManagerImpl(transactionRunner, dataTemplateManager);
-        dbServiceManager.saveManager(new Manager("ManagerFirst"));
-
-        var managerSecond = dbServiceManager.saveManager(new Manager("ManagerSecond"));
-        var managerSecondSelected = dbServiceManager.getManager(managerSecond.getNo())
-                .orElseThrow(() -> new RuntimeException("Manager not found, id:" + managerSecond.getNo()));
-        log.info("managerSecondSelected:{}", managerSecondSelected);
+        for (long i = 1L; i < 1000L; i++){
+            String name = "name" + i;
+            decoratorServiceClient.saveClient(new Client(name));
+        }
+        for (long j = 999L; j > 0; j--){
+            long finalJ = j;
+            var selectedClient = decoratorServiceClient.getClient(j)
+                    .orElseThrow(() -> new RuntimeException("Client not found, id:" + finalJ));
+            log.info("selectedClient:{}", selectedClient);
+        }
     }
 
     private static void flywayMigrations(DataSource dataSource) {

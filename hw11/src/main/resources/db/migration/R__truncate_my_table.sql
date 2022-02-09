@@ -1,0 +1,3 @@
+TRUNCATE TABLE client;
+
+ALTER SEQUENCE client_id_seq RESTART;

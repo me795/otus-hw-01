@@ -1,4 +1,4 @@
-package ru.otus.cachehw;
+package ru.dvsokolov.cachehw;
 
 
 public interface HwCache<K, V> {

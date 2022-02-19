@@ -1,0 +1,74 @@
+<!--<html xmlns="http://www.w3.org/1999/xhtml">-->
+<!--<head>-->
+<!--    <title>Клиенты</title>-->
+<!--    <script>-->
+<!--        function getUserById() {-->
+<!--            const userIdTextBox = document.getElementById('userIdTextBox');-->
+<!--            const userDataContainer = document.getElementById('userDataContainer');-->
+<!--            const id = userIdTextBox.value;-->
+<!--            //fetch('api/user?id=' + id)-->
+<!--            fetch('api/user/' + id)-->
+<!--                .then(response => response.json())-->
+<!--                .then(user => userDataContainer.innerHTML = JSON.stringify(user));-->
+<!--        }-->
+<!--    </script>-->
+<!--</head>-->
+
+<!--<body>-->
+
+<h1>Создание нового клиента</h1>
+<div class="client_form">
+    <div>
+        <label for="client_form_input_name" class="client_form_label">Имя:</label>
+        <input id="client_form_input_name" class="client_form_input"/>
+    </div>
+    <div>
+        <label for="client_form_input_address" class="client_form_label">Адрес:</label>
+        <input id="client_form_input_address" class="client_form_input"/>
+    </div>
+    <div>
+        <label for="client_form_input_phone" class="client_form_label">Телефон:</label>
+        <input id="client_form_input_phone" class="client_form_input"/>
+    </div>
+    <button class="student_form_button" onclick="addButtonHandler()">Добавить</button>
+</div>
+
+
+<!--<h4>Получить пользователя по id</h4>-->
+<!--<input type="text" id = "userIdTextBox" value="3" placeholder="Введите id пользователя">-->
+<!--<button onclick="getUserById()">Получить</button>-->
+<!--<pre id = "userDataContainer"></pre>-->
+
+<h1>Список клиентов</h1>
+<table >
+    <thead>
+        <tr>
+            <th style="width: 50px">id</th>
+            <th style="width: 100px">Имя</th>
+            <th style="width: 200px">Адрес</th>
+            <th style="width: 200px">Номера телефонов</th>
+        </tr>
+    </thead>
+    <tbody id="table_body">
+        <#list clientList as client>
+        <tr class="table_client_record">
+            <td>${client.id}</td>
+            <td>${client.name}</td>
+            <td>
+                <#if client.address??>
+                ${client.address.street}
+                </#if>
+            </td>
+            <td>
+                <#list client.phones as phone>
+                    ${phone.number}
+                    <#if (phone_has_next)>
+                        </br>
+                    </#if>
+                </#list>
+            </td>
+        </tr>
+        </#list>
+    </tbody>
+</table>
+

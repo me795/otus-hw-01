@@ -1,4 +1,4 @@
-package ru.dvsokolov.jpql.crm.model;
+package ru.dvsokolov.model;
 
 import javax.persistence.*;
 

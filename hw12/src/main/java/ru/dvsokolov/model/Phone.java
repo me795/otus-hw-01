@@ -1,7 +1,6 @@
-package ru.dvsokolov.jpql.crm.model;
+package ru.dvsokolov.model;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
 @Table(name = "phones")
@@ -15,9 +14,9 @@ public class Phone implements Cloneable {
     @Column(name = "number")
     private String number;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id",nullable = false)
-    private Client client;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "client_id",nullable = false)
+//    private Client client;
 
     public Phone () {}
 
@@ -45,9 +44,9 @@ public class Phone implements Cloneable {
         return number;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
-    }
+//    public void setClient(Client client) {
+//        this.client = client;
+//    }
 
     @Override
     public String toString() {

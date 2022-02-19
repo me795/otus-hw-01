@@ -1,4 +1,4 @@
-package ru.dvsokolov.jpql.crm.model;
+package ru.dvsokolov.model;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,9 +20,10 @@ public class Client implements Cloneable {
     @JoinColumn(name = "address_id")
     private Address address;
 
-    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL,
+    @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.EAGER,
             orphanRemoval = true)
+    @JoinColumn(name = "client_id")
     private List<Phone> phones;
 
     public Client() {
@@ -44,7 +45,7 @@ public class Client implements Cloneable {
         this.name = name;
         this.address = address;
         this.phones = phones;
-        this.phones.forEach(p -> p.setClient(this));
+//        this.phones.forEach(p -> p.setClient(this));
     }
 
     @Override

@@ -6,7 +6,6 @@ import ru.dvsokolov.ioc.appcontainer.api.AppComponentsContainerConfig;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AppComponentsContainerImpl implements AppComponentsContainer {
 
@@ -23,19 +22,20 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
         var methods = configClass.getDeclaredMethods();
         Arrays.stream(methods)
                 .filter(m -> m.isAnnotationPresent(AppComponent.class))
-                .sorted((m1, m2) -> Integer.compare(m1.getAnnotation(AppComponent.class).order(), m2.getAnnotation(AppComponent.class).order()))
+                .sorted(Comparator.comparing(m -> m.getAnnotation(AppComponent.class).order()))
                 .forEach(m -> {
-                    var params = m.getParameters();
-                    var paramsReady = Arrays.stream(params)
-                            .map(p ->
-                                    getAppComponent(p.getType())
-                            ).toArray();
+                    var methodParams = Arrays.stream(m.getParameterTypes())
+                            .map(this::getAppComponent).toArray();
                     try {
-                        var component = m.invoke(configClass.getDeclaredConstructor().newInstance(), paramsReady);
-                        appComponents.add(component);
-                        appComponentsByName.put(m.getAnnotation(AppComponent.class).name(), component);
+                        var component = m.invoke(configClass.getDeclaredConstructor().newInstance(), methodParams);
+                        var key = m.getAnnotation(AppComponent.class).name();
+                        if (! appComponentsByName.containsKey(key)) {
+                            appComponents.add(component);
+                            appComponentsByName.put(key, component);
+                        }
                     } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
                         e.printStackTrace();
+                        throw new RuntimeException("Invoke failed for method: " + m.getName());
                     }
                 });
     }
@@ -49,16 +49,8 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     @Override
     public <C> C getAppComponent(Class<C> componentClass) {
 
-        var interfaceComponentClass = (componentClass.isInterface())
-                ? componentClass
-                : Arrays.stream(componentClass.getInterfaces())
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Interfaces not found"));
-
         return (C) appComponents.stream()
-                .filter(cmp -> Arrays.stream(cmp.getClass().getInterfaces())
-                        .findFirst().orElseThrow(() -> new RuntimeException("Interfaces not found"))
-                        .getName().equals(interfaceComponentClass.getName()))
+                .filter(cmp -> componentClass.isAssignableFrom(cmp.getClass()))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No such component"));
 
@@ -66,6 +58,11 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 
     @Override
     public <C> C getAppComponent(String componentName) {
-        return (C) appComponentsByName.get(componentName);
+        C resultComponent = (C) appComponentsByName.get(componentName);
+        if (resultComponent == null){
+            throw new RuntimeException("No such component");
+        }else {
+            return (C) appComponentsByName.get(componentName);
+        }
     }
 }

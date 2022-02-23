@@ -1,11 +1,9 @@
 package ru.dvsokolov.ioc;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import ru.dvsokolov.ioc.appcontainer.AppComponentsContainerImpl;
-import ru.dvsokolov.ioc.appcontainer.api.AppComponentsContainer;
 import ru.dvsokolov.ioc.config.AppConfig;
 import ru.dvsokolov.ioc.services.*;
 

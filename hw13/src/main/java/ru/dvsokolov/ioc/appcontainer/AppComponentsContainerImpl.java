@@ -32,6 +32,8 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
                         if (! appComponentsByName.containsKey(key)) {
                             appComponents.add(component);
                             appComponentsByName.put(key, component);
+                        }else{
+                            throw new RuntimeException("Duplication of component names: " + key);
                         }
                     } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
                         e.printStackTrace();

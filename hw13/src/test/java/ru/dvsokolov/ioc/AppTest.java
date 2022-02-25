@@ -1,11 +1,9 @@
 package ru.dvsokolov.ioc;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import ru.dvsokolov.ioc.appcontainer.AppComponentsContainerImpl;
-import ru.dvsokolov.ioc.appcontainer.api.AppComponentsContainer;
 import ru.dvsokolov.ioc.config.AppConfig;
 import ru.dvsokolov.ioc.services.*;
 
@@ -19,24 +17,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AppTest {
 
-    @Disabled //надо удалить
     @DisplayName("Из контекста тремя способами должен корректно доставаться компонент с проставленными полями")
     @ParameterizedTest(name = "Достаем по: {0}")
-    @CsvSource(value = {"GameProcessor, ru.otus.services.GameProcessor",
-            "GameProcessorImpl, ru.otus.services.GameProcessor",
-            "gameProcessor, ru.otus.services.GameProcessor",
+    @CsvSource(value = {"GameProcessor, ru.dvsokolov.ioc.services.GameProcessor",
+            "GameProcessorImpl, ru.dvsokolov.ioc.services.GameProcessor",
+            "gameProcessor, ru.dvsokolov.ioc.services.GameProcessor",
 
-            "IOService, ru.otus.services.IOService",
-            "IOServiceConsole, ru.otus.services.IOService",
-            "ioService, ru.otus.services.IOService",
+            "IOService, ru.dvsokolov.ioc.services.IOService",
+            "IOServiceConsole, ru.dvsokolov.ioc.services.IOService",
+            "ioService, ru.dvsokolov.ioc.services.IOService",
 
-            "PlayerService, ru.otus.services.PlayerService",
-            "PlayerServiceImpl, ru.otus.services.PlayerService",
-            "playerService, ru.otus.services.PlayerService",
+            "PlayerService, ru.dvsokolov.ioc.services.PlayerService",
+            "PlayerServiceImpl, ru.dvsokolov.ioc.services.PlayerService",
+            "playerService, ru.dvsokolov.ioc.services.PlayerService",
 
-            "EquationPreparer, ru.otus.services.EquationPreparer",
-            "EquationPreparerImpl, ru.otus.services.EquationPreparer",
-            "equationPreparer, ru.otus.services.EquationPreparer"
+            "EquationPreparer, ru.dvsokolov.ioc.services.EquationPreparer",
+            "EquationPreparerImpl, ru.dvsokolov.ioc.services.EquationPreparer",
+            "equationPreparer, ru.dvsokolov.ioc.services.EquationPreparer"
     })
     public void shouldExtractFromContextCorrectComponentWithNotNullFields(String classNameOrBeanId, Class<?> rootClass) throws Exception {
         var ctx = new AppComponentsContainerImpl(AppConfig.class);
@@ -44,7 +41,7 @@ class AppTest {
         assertThat(classNameOrBeanId).isNotEmpty();
         Object component;
         if (classNameOrBeanId.charAt(0) == classNameOrBeanId.toUpperCase().charAt(0)) {
-            Class<?> gameProcessorClass = Class.forName("ru.otus.services." + classNameOrBeanId);
+            Class<?> gameProcessorClass = Class.forName("ru.dvsokolov.ioc.services." + classNameOrBeanId);
             assertThat(rootClass).isAssignableFrom(gameProcessorClass);
 
             component = ctx.getAppComponent(gameProcessorClass);

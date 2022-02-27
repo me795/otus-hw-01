@@ -6,4 +6,5 @@ public interface Versions {
     String freemarker = "2.3.31";
     String testcontainers = "1.15.3";
     String reflections = "0.10.2";
+    String glassfishJson = "1.1.4";
 }

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" content="text/html;" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>HW14 Clients</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../styles/main.css?v=" th:attrappend="href=${scriptsVersion}"/>
+    <script type="text/javascript" src="../scripts/main.js?v=" th:attrappend="src=${scriptsVersion}"></script>
+</head>
+<body>
+
+<h1>Создание нового клиента</h1>
+<div class="client_form">
+    <div>
+        <label for="client_form_input_name" class="client_form_label">Имя:</label>
+        <input id="client_form_input_name" class="client_form_input"/>
+    </div>
+    <div>
+        <label for="client_form_input_address" class="client_form_label">Адрес:</label>
+        <input id="client_form_input_address" class="client_form_input"/>
+    </div>
+    <div>
+        <label for="client_form_input_phone" class="client_form_label">Телефон:</label>
+        <input id="client_form_input_phone" class="client_form_input"/>
+    </div>
+    <button class="client_form_button" onclick="addButtonHandler()">Добавить</button>
+</div>
+
+<h1>Список клиентов</h1>
+<table >
+    <thead>
+        <tr>
+            <th style="width: 50px">id</th>
+            <th style="width: 100px">Имя</th>
+            <th style="width: 200px">Адрес</th>
+            <th style="width: 200px">Номера телефонов</th>
+            <th style="width: 100px"></th>
+        </tr>
+    </thead>
+    <tbody id="table_body">
+        <tr class="table_client_record" th:each="client : ${clients}">
+            <td th:text="${client.id}" class="client_id">1</td>
+            <td th:text="${client.name}">John Doe</td>
+            <td th:text="${client?.address?.street}">Avenue 5</td>
+            <td>
+                <th:block th:each="phone : ${client.phones}">
+                    <span th:text="${phone.number}">81234561212</span><br/>
+                </th:block>
+            </td>
+            <td>
+                <button class="remove_client_button" onclick="removeButtonHandler(this)">Удалить</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
+

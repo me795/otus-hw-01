@@ -7,6 +7,7 @@ import ru.dvsokolov.api.SensorDataProcessor;
 import ru.dvsokolov.api.model.SensorData;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 // Этот класс нужно реализовать
 public class SensorDataProcessorBuffered implements SensorDataProcessor {
@@ -14,7 +15,7 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
 
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
-    private final Queue<SensorData> dataBuffer = new LinkedList<>();
+    private final Queue<SensorData> dataBuffer = new ConcurrentLinkedQueue<>();
     private static final Comparator<SensorData> COMPARE_BY_TIME = Comparator.comparing(SensorData::getMeasurementTime);
 
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
@@ -34,7 +35,7 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
     }
 
     public void flush() {
-        synchronized(dataBuffer) {
+        synchronized(writer) {
             if (dataBuffer.size() > 0) {
                 var bufferedData = new ArrayList<>(dataBuffer);
                 bufferedData.sort(SensorDataProcessorBuffered.COMPARE_BY_TIME);

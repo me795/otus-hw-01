@@ -6,12 +6,17 @@ import ru.dvsokolov.lib.SensorDataBufferedWriter;
 import ru.dvsokolov.api.SensorDataProcessor;
 import ru.dvsokolov.api.model.SensorData;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 // Этот класс нужно реализовать
 public class SensorDataProcessorBuffered implements SensorDataProcessor {
     private static final Logger log = LoggerFactory.getLogger(SensorDataProcessorBuffered.class);
 
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
+    private final Queue<SensorData> dataBuffer = new ConcurrentLinkedQueue<>();
+    private static final Comparator<SensorData> COMPARE_BY_TIME = Comparator.comparing(SensorData::getMeasurementTime);
 
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
         this.bufferSize = bufferSize;
@@ -20,18 +25,27 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
 
     @Override
     public void process(SensorData data) {
-    /*
+        var pushResult = dataBuffer.offer(data);
+        if (!pushResult) {
+            log.warn("Буфер переолнен");
+        }
         if (dataBuffer.size() >= bufferSize) {
             flush();
         }
-    */
     }
 
     public void flush() {
-        try {
-            //writer.writeBufferedData(bufferedData);
-        } catch (Exception e) {
-            log.error("Ошибка в процессе записи буфера", e);
+        synchronized(writer) {
+            if (dataBuffer.size() > 0) {
+                var bufferedData = new ArrayList<>(dataBuffer);
+                bufferedData.sort(SensorDataProcessorBuffered.COMPARE_BY_TIME);
+                try {
+                    writer.writeBufferedData(bufferedData);
+                    dataBuffer.clear();
+                } catch (Exception e) {
+                    log.error("Ошибка в процессе записи буфера", e);
+                }
+            }
         }
     }
 

@@ -1,31 +1,25 @@
 package ru.dvsokolov.protobuf.service;
 
-import ru.dvsokolov.protobuf.model.User;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class RealDBServiceImpl implements RealDBService {
-    private final AtomicInteger idCounter;
-    private final List<User> users;
+    private final List<Long> longList;
 
     public RealDBServiceImpl() {
-        idCounter = new AtomicInteger(0);
-        users = new ArrayList<>();
-        users.add(new User(idCounter.incrementAndGet(), "Дима", "Жмых"));
-        users.add(new User(idCounter.incrementAndGet(), "Оля", "Фитоняшкина"));
+        longList = new ArrayList<>();
     }
 
     @Override
-    public User saveUser(String firstName, String lastName) {
-        User user = new User(idCounter.incrementAndGet(), firstName, lastName);
-        users.add(user);
-        return user;
+    public List<Long> startCount(long start, long end) {
+
+        long counter = start;
+        while (counter <= end){
+            longList.add(counter);
+            counter++;
+        }
+
+        return longList;
     }
 
-    @Override
-    public List<User> findAllUsers() {
-        return users;
-    }
 }

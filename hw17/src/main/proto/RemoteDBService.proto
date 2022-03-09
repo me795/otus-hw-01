@@ -4,15 +4,15 @@ package ru.dvsokolov.protobuf.generated;
 
 option java_multiple_files = true;
 
-message UserMessage {
-    int64 id = 1;
-    string firstName = 2;
-    string lastName = 3;
+message Counter {
+    int64 value = 1;
 }
 
-message Empty {}
+message Interval {
+    int64 start = 1;
+    int64 end = 2;
+}
 
 service RemoteDBService {
-    rpc saveUser(UserMessage) returns (UserMessage);
-    rpc findAllUsers(Empty) returns (stream UserMessage);
+    rpc startCount(Interval) returns (stream Counter);
 }

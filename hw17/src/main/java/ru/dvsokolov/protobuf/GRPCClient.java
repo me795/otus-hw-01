@@ -2,45 +2,51 @@ package ru.dvsokolov.protobuf;
 
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
-import ru.dvsokolov.protobuf.generated.Empty;
+import ru.dvsokolov.protobuf.clientservice.ValueProcessor;
+import ru.dvsokolov.protobuf.generated.Counter;
 import ru.dvsokolov.protobuf.generated.RemoteDBServiceGrpc;
-import ru.dvsokolov.protobuf.generated.UserMessage;
+import ru.dvsokolov.protobuf.generated.Interval;
 
 import java.util.concurrent.CountDownLatch;
 
 public class GRPCClient {
 
     private static final String SERVER_HOST = "localhost";
-    private static final int SERVER_PORT = 8190;
+    private static final int SERVER_PORT = 8191;
 
     public static void main(String[] args) throws InterruptedException {
         var channel = ManagedChannelBuilder.forAddress(SERVER_HOST, SERVER_PORT)
                 .usePlaintext()
                 .build();
+        var valueProcessor = new ValueProcessor();
 
-        var stub = RemoteDBServiceGrpc.newBlockingStub(channel);
-        var savedUserMsg = stub.saveUser(
-                UserMessage.newBuilder().setFirstName("Вася").setLastName("Кириешкин").build()
-        );
 
-        System.out.printf("Мы сохранили Васю: {id: %d, name: %s %s}%n",
-                savedUserMsg.getId(), savedUserMsg.getFirstName(), savedUserMsg.getLastName());
+        System.out.println("Let's get start!");
 
-        var allUsersIterator = stub.findAllUsers(Empty.getDefaultInstance());
-        System.out.println("Конградулейшенз! Мы получили юзеров! Среди них должен найтись один Вася!");
-        allUsersIterator.forEachRemaining(um ->
-                System.out.printf("{id: %d, name: %s %s}%n",
-                        um.getId(), um.getFirstName(), um.getLastName())
-        );
+        var thread = new Thread(() -> {
+            for (int i = 0; i < 50; i++){
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized (valueProcessor) {
+                    valueProcessor.calculateCurrentValue();
+                }
+            }
+            Thread.currentThread().interrupt();
+        });
 
-        System.out.println("\n\n\nА теперь тоже самое, только асинхронно!!!\n\n");
         var latch = new CountDownLatch(1);
         var newStub = RemoteDBServiceGrpc.newStub(channel);
-        newStub.findAllUsers(Empty.getDefaultInstance(), new StreamObserver<UserMessage>() {
+        newStub.startCount(Interval.newBuilder().setStart(0).setEnd(30).build(), new StreamObserver<Counter>() {
             @Override
-            public void onNext(UserMessage um) {
-                System.out.printf("{id: %d, name: %s %s}%n",
-                        um.getId(), um.getFirstName(), um.getLastName());
+            public void onNext(Counter c) {
+                synchronized (valueProcessor) {
+                    System.out.printf("{Server value: %d}%n",
+                            c.getValue());
+                    valueProcessor.setCurrentServerValue(c.getValue());
+                }
             }
 
             @Override
@@ -50,13 +56,16 @@ public class GRPCClient {
 
             @Override
             public void onCompleted() {
-                System.out.println("\n\nЯ все!");
+                System.out.println("\n\nThat's all folks!");
                 latch.countDown();
             }
         });
 
+        thread.start();
+
         latch.await();
 
         channel.shutdown();
+        thread.join();
     }
 }

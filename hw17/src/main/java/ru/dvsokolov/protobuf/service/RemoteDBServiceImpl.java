@@ -1,10 +1,9 @@
 package ru.dvsokolov.protobuf.service;
 
 import io.grpc.stub.StreamObserver;
-import ru.dvsokolov.protobuf.model.User;
-import ru.dvsokolov.protobuf.generated.Empty;
+import ru.dvsokolov.protobuf.generated.Counter;
+import ru.dvsokolov.protobuf.generated.Interval;
 import ru.dvsokolov.protobuf.generated.RemoteDBServiceGrpc;
-import ru.dvsokolov.protobuf.generated.UserMessage;
 
 import java.util.List;
 
@@ -17,31 +16,22 @@ public class RemoteDBServiceImpl extends RemoteDBServiceGrpc.RemoteDBServiceImpl
     }
 
     @Override
-    public void saveUser(UserMessage request, StreamObserver<UserMessage> responseObserver) {
-        User user = realDBService.saveUser(request.getFirstName(), request.getLastName());
-        responseObserver.onNext(user2UserMessage(user));
-        responseObserver.onCompleted();
-    }
-
-    @Override
-    public void findAllUsers(Empty request, StreamObserver<UserMessage> responseObserver) {
-        List<User> allUsers = realDBService.findAllUsers();
-        allUsers.forEach(u -> {
+    public void startCount(Interval request, StreamObserver<Counter> responseObserver) {
+        List<Long> longList = realDBService.startCount(request.getStart(), request.getEnd());
+        longList.forEach(l -> {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            responseObserver.onNext(user2UserMessage(u));
+            responseObserver.onNext(getCounterObject(l));
         });
         responseObserver.onCompleted();
     }
 
-    private UserMessage user2UserMessage(User user) {
-        return UserMessage.newBuilder()
-                .setId(user.getId())
-                .setFirstName(user.getFirstName())
-                .setLastName(user.getLastName())
+    private Counter getCounterObject(Long l) {
+        return Counter.newBuilder()
+                .setValue(l)
                 .build();
     }
 }
